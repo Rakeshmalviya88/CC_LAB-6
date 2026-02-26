@@ -15,10 +15,13 @@ pipeline {
             steps {
                 sh '''
                 docker network create app-network 2>/dev/null || true
-
-                docker rm -f backend1 2>/dev/null || true
-                docker rm -f backend2 2>/dev/null || true
-
+        
+                # Force remove backend1 if exists
+                docker ps -aq --filter "name=^backend1$" | xargs -r docker rm -f
+        
+                # Force remove backend2 if exists
+                docker ps -aq --filter "name=^backend2$" | xargs -r docker rm -f
+        
                 docker run -d --name backend1 --network app-network backend-app
                 docker run -d --name backend2 --network app-network backend-app
                 '''
